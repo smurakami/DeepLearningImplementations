@@ -2,3 +2,5 @@ data/processed/*.h5
 figures/*.png
 models/CNN*
 src/data/pix2pix
+
+src/model/*.ipynb
