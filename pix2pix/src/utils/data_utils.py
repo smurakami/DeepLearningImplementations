@@ -83,11 +83,24 @@ def load_data(dset, image_data_format):
         return X_full_train, X_sketch_train, X_full_val, X_sketch_val
 
 
+from keras.preprocessing.image import ImageDataGenerator
+
+
 def gen_batch(X1, X2, batch_size):
+    gen = ImageDataGenerator(
+        rotation_range=30,
+        width_shift_range=0.2,
+        height_shift_range=0.2,
+        shear_range=0.3,
+        zoom_range=0.2,
+        horizontal_flip=True )
+
+    seed = np.random.randint(10 ** 6)
+    flow_1 = gen.flow(X1, batch_size=4, shuffle=True, seed=seed)
+    flow_2 = gen.flow(X2, batch_size=4, shuffle=True, seed=seed)
 
     while True:
-        idx = np.random.choice(X1.shape[0], batch_size, replace=False)
-        yield X1[idx], X2[idx]
+        yield flow_1.next(), flow_2.next()
 
 
 def get_disc_batch(X_full_batch, X_sketch_batch, generator_model, batch_counter, patch_size,

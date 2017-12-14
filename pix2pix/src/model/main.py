@@ -1,5 +1,8 @@
 import os
 import argparse
+import matplotlib
+
+matplotlib.use('agg')
 
 
 def launch_training(**kwargs):
