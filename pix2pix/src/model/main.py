@@ -30,7 +30,11 @@ if __name__ == "__main__":
     parser.add_argument('--use_label_smoothing', action="store_true", help="Whether to smooth the positive labels when training D")
     parser.add_argument('--label_flipping', default=0, type=float, help="Probability (0 to 1.) to flip the labels when training D")
 
+    parser.add_argument('--continue_training', action="store_true", help="Whether to use trained model")
+
     args = parser.parse_args()
+
+    print(args.continue_training)
 
     # Set the backend by modifying the env variable
     if args.backend == "theano":
@@ -67,7 +71,8 @@ if __name__ == "__main__":
                 "use_label_smoothing": args.use_label_smoothing,
                 "label_flipping": args.label_flipping,
                 "patch_size": args.patch_size,
-                "use_mbd": args.use_mbd
+                "use_mbd": args.use_mbd,
+                "continue_training": args.continue_training
                 }
 
     # Launch training

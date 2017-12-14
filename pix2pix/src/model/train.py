@@ -11,6 +11,10 @@ sys.path.append("../utils")
 import general_utils
 import data_utils
 
+import glob
+import re
+
+
 
 def l1_loss(y_true, y_pred):
     return K.sum(K.abs(y_pred - y_true), axis=-1)
@@ -39,6 +43,8 @@ def train(**kwargs):
     label_flipping = kwargs["label_flipping"]
     dset = kwargs["dset"]
     use_mbd = kwargs["use_mbd"]
+
+    continue_training = kwargs["continue_training"]
 
     epoch_size = n_batch_per_epoch * batch_size
 
@@ -83,6 +89,30 @@ def train(**kwargs):
                                    patch_size,
                                    image_data_format)
 
+        currentEpoch = 0
+        if continue_training:
+            print('load_model...')
+            getEpoch = lambda file: int(re.sub('\w*epoch', '', file).replace('.h5', ''))
+            model_dir = "../../models/%s" % model_name
+
+            gen_weights_path = sorted(glob.glob(os.path.join('../../models/%s/gen_weights_epoch*.h5' % (model_name))), key=getEpoch)[-1]
+            generator_model.load_weights(gen_weights_path)
+
+            print("gen_weights_path:", gen_weights_path)
+
+            disc_weights_path = sorted(glob.glob(os.path.join('../../models/%s/disc_weights_epoch*.h5' % (model_name))), key=getEpoch)[-1]
+            discriminator_model.load_weights(disc_weights_path)
+            print("disc_weights_path:", disc_weights_path)
+
+            DCGAN_weights_path = sorted(glob.glob(os.path.join('../../models/%s/DCGAN_weights_epoch*.h5' % (model_name))), key=getEpoch)[-1]
+            DCGAN_model.load_weights(DCGAN_weights_path)
+            print("DCGAN_weights_path:", DCGAN_weights_path)
+
+            currentEpoch = sorted(map(getEpoch, [gen_weights_path, disc_weights_path, DCGAN_weights_path]))[-1]
+
+        return
+
+
         loss = [l1_loss, 'binary_crossentropy']
         loss_weights = [4E1, 1]
         DCGAN_model.compile(loss=loss, loss_weights=loss_weights, optimizer=opt_dcgan)
@@ -95,7 +125,7 @@ def train(**kwargs):
 
         # Start training
         print("Start training")
-        for e in range(nb_epoch):
+        for e in range(currentEpoch + 1, nb_epoch):
             # Initialize progbar and batch counter
             progbar = generic_utils.Progbar(epoch_size)
             batch_counter = 1
