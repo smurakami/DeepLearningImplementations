@@ -92,7 +92,7 @@ def train(**kwargs):
         currentEpoch = 0
         if continue_training:
             print('load_model...')
-            getEpoch = lambda file: int(re.sub('\w*epoch', '', file).replace('.h5', ''))
+            getEpoch = lambda file: int(re.sub('.*epoch', '', file).replace('.h5', ''))
             model_dir = "../../models/%s" % model_name
 
             gen_weights_path = sorted(glob.glob(os.path.join('../../models/%s/gen_weights_epoch*.h5' % (model_name))), key=getEpoch)[-1]
@@ -109,8 +109,6 @@ def train(**kwargs):
             print("DCGAN_weights_path:", DCGAN_weights_path)
 
             currentEpoch = sorted(map(getEpoch, [gen_weights_path, disc_weights_path, DCGAN_weights_path]))[-1]
-
-        return
 
 
         loss = [l1_loss, 'binary_crossentropy']
