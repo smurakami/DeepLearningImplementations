@@ -41,7 +41,7 @@ def lambda_output(input_shape):
 #     x = Conv2D(f, (3, 3), name=name, padding="same")(x)
 #     if bn:
 #         x = BatchNormalization(axis=bn_axis)(x)
-#     x = Activation("relu")(x)
+#     x = LeakyReLU(0.2)(x)
 #     if dropout:
 #         x = Dropout(0.5)(x)
 
@@ -59,7 +59,7 @@ def conv_block_unet(x, f, name, bn_mode, bn_axis, bn=True, strides=(2,2)):
 
 def up_conv_block_unet(x, x2, f, name, bn_mode, bn_axis, bn=True, dropout=False):
 
-    x = Activation("relu")(x)
+    x = LeakyReLU(0.2)(x)
     x = UpSampling2D(size=(2, 2))(x)
     x = Conv2D(f, (3, 3), name=name, padding="same")(x)
     if bn:
@@ -74,7 +74,7 @@ def up_conv_block_unet(x, x2, f, name, bn_mode, bn_axis, bn=True, dropout=False)
 def deconv_block_unet(x, x2, f, h, w, batch_size, name, bn_mode, bn_axis, bn=True, dropout=False):
 
     o_shape = (batch_size, h * 2, w * 2, f)
-    x = Activation("relu")(x)
+    x = LeakyReLU(0.2)(x)
     x = Deconv2D(f, (3, 3), output_shape=o_shape, strides=(2, 2), padding="same")(x)
     if bn:
         x = BatchNormalization(axis=bn_axis)(x)
@@ -130,7 +130,7 @@ def generator_unet_upsampling(img_dim, bn_mode, model_name="generator_unet_upsam
         conv = up_conv_block_unet(list_decoder[-1], list_encoder[-(i + 3)], f, name, bn_mode, bn_axis, dropout=d)
         list_decoder.append(conv)
 
-    x = Activation("relu")(list_decoder[-1])
+    x = LeakyReLU(0.2)(list_decoder[-1])
     x = UpSampling2D(size=(2, 2))(x)
     x = Conv2D(nb_channels, (3, 3), name="last_conv", padding="same")(x)
     x = Activation("tanh")(x)
@@ -188,7 +188,7 @@ def generator_unet_deconv(img_dim, bn_mode, batch_size, model_name="generator_un
         list_decoder.append(conv)
         h, w = h * 2, w * 2
 
-    x = Activation("relu")(list_decoder[-1])
+    x = LeakyReLU(0.2)(list_decoder[-1])
     o_shape = (batch_size,) + img_dim
     x = Deconv2D(nb_channels, (3, 3), output_shape=o_shape, strides=(2, 2), padding="same")(x)
     x = Activation("tanh")(x)
