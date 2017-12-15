@@ -86,7 +86,7 @@ def load_data(dset, image_data_format):
 from keras.preprocessing.image import ImageDataGenerator
 
 
-def gen_batch(X1, X2, batch_size):
+def gen_batch(X1, X2, batch_size, shuffle=True):
     gen = ImageDataGenerator(
         rotation_range=30,
         width_shift_range=0.2,
@@ -96,8 +96,8 @@ def gen_batch(X1, X2, batch_size):
         horizontal_flip=True )
 
     seed = np.random.randint(10 ** 6)
-    flow_1 = gen.flow(X1, batch_size=4, shuffle=True, seed=seed)
-    flow_2 = gen.flow(X2, batch_size=4, shuffle=True, seed=seed)
+    flow_1 = gen.flow(X1, batch_size=4, shuffle=shuffle, seed=seed)
+    flow_2 = gen.flow(X2, batch_size=4, shuffle=shuffle, seed=seed)
 
     while True:
         yield flow_1.next(), flow_2.next()
