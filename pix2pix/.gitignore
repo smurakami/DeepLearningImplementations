@@ -3,5 +3,7 @@ figures/*.png
 models/CNN*
 src/data/pix2pix
 
-src/model/*.ipynb
+src/model/*.ipynbfigures_*
+
 figures_*
+
